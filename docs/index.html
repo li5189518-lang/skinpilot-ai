@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SkinPilot AI</title>
+<style>
+:root{--bg:#F5F5F7;--card:#fff;--ink:#1D1D1F;--mute:#86868B;--line:#E5E5EA;--acc:#0A84A6;--accs:#E6F4F8;--warn:#B25E00;--warns:#FFF1DD;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1C1C1E;--ink:#F5F5F7;--mute:#98989D;--line:#2C2C2E;--acc:#4CC3E6;--accs:#12303A;--warn:#FFB454;--warns:#33260F}}
+:root[data-theme="dark"]{--bg:#000;--card:#1C1C1E;--ink:#F5F5F7;--mute:#98989D;--line:#2C2C2E;--acc:#4CC3E6;--accs:#12303A;--warn:#FFB454;--warns:#33260F}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 -apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
+#app{max-width:520px;margin:0 auto;padding:28px 22px 120px}
+h1{font-size:40px;line-height:1.08;font-weight:700;letter-spacing:-1.2px;margin:6px 0 10px}
+h2{font-size:22px;font-weight:600;letter-spacing:-.4px;margin:26px 0 6px}
+p{margin:6px 0}.mute{color:var(--mute);font-size:15px}
+.card{background:var(--card);border-radius:28px;padding:22px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 30px rgba(0,0,0,.05)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{border:0;background:var(--card);color:var(--ink);border-radius:99px;padding:10px 17px;font:inherit;font-size:15px;cursor:pointer;box-shadow:inset 0 0 0 1px var(--line);transition:.2s}
+.chip.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.btn{display:block;width:100%;border:0;border-radius:99px;padding:16px;font:600 17px inherit;font-family:inherit;background:var(--ink);color:var(--bg);cursor:pointer;margin-top:18px;transition:transform .15s}
+.btn:active{transform:scale(.98)}.btn.g{background:transparent;color:var(--acc);margin-top:6px}.btn:disabled{opacity:.35}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+input,select{width:100%;border:0;box-shadow:inset 0 0 0 1px var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:13px;font:inherit;margin:4px 0}
+.tag{display:inline-block;font-size:13px;border-radius:99px;padding:2px 10px;margin:0 6px 4px 0;background:var(--accs);color:var(--acc)}
+.tag.w{background:var(--warns);color:var(--warn)}.tag.n{background:var(--line);color:var(--mute)}
+.demo{background:var(--warns);color:var(--warn);border-radius:16px;padding:10px 14px;font-size:14px;margin:12px 0}
+.hero{text-align:center;padding:18px 0 4px}.hero .av{width:150px;height:150px;border-radius:50%;box-shadow:0 20px 50px rgba(10,132,166,.25)}
+.av{display:block;margin:0 auto}.eye{animation:blink 5s infinite;transform-origin:center;transform-box:fill-box}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.mouth{transform-origin:60px 70px}.sp .mouth{animation:talk .35s infinite alternate}@keyframes talk{to{transform:scaleY(1.9)}}
+.bub{background:var(--card);border-radius:24px 24px 24px 6px;padding:16px 18px;margin:12px 0;box-shadow:0 8px 30px rgba(0,0,0,.06);animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pick button{border:0;background:var(--card);border-radius:24px;padding:14px;color:var(--ink);font:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px var(--line)}
+.pick button.on{box-shadow:inset 0 0 0 3px var(--acc)}.pick .av{width:92px;height:92px;border-radius:50%}
+.dots{display:flex;gap:6px;margin:6px 0 10px}.dots i{flex:1;height:4px;border-radius:4px;background:var(--line)}.dots i.on{background:var(--acc)}
+.timer{font-size:56px;font-weight:700;letter-spacing:-2px;font-variant-numeric:tabular-nums;text-align:center}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat .card{margin:0}.stat b{display:block;font-size:38px;letter-spacing:-1.5px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--card) 78%,transparent);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-top:1px solid var(--line)}
+nav button{flex:1;max-width:110px;background:none;border:0;color:var(--mute);font:500 13px inherit;font-family:inherit;padding:8px;cursor:pointer}nav button.on{color:var(--ink);font-weight:700}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div id="app"></div><nav id="nav"></nav>
+<script>
+const LV=[["有充分证据支持","a"],["证据有限","w"],["仅视频创作者个人经验","n"],["暂无可靠依据","n"]];
+const D={title:"晚间基础护肤三步（演示教程）",steps:[
+{cat:"洁面",t:"温和洁面",ts:"0:20",min:1,said:"用温水打湿脸，取适量洁面揉出泡沫，轻柔打圈 30–60 秒后冲净。",inf:"具体洁面品牌与成分视频未提及。",how:"手心揉出泡沫再上脸，避开眼周，水温略温。",bad:"用力搓洗；水太烫；洗完不保湿。",why:"清除当天的防晒、油脂和污垢，为后续产品做准备。",skip:"晚间不建议跳过；当天未上妆未出汗时可只用清水。",noprod:"先用清水洗脸，之后补一款温和洁面（类别：低刺激、无皂基）。",dont:"简单说：把洁面揉出泡沫，轻轻在脸上画圈，再冲干净。"},
+{cat:"精华",t:"保湿精华",ts:"2:05",min:1,said:"洁面后趁脸微湿，取 2–3 滴精华轻按至吸收。",inf:"视频未标注成分，AI 推测为保湿型，请核对瓶身。",how:"滴在掌心，用按压方式上脸，不要拉扯皮肤。",bad:"一次用太多；与刺激性产品叠加。",why:"补充水分，让面霜锁水更有效。",skip:"可以。精华不是必需步骤，预算有限时可先不买。",noprod:"暂时跳过，直接进入面霜。",dont:"简单说：2–3 滴，用手掌轻轻按进皮肤。"},
+{cat:"面霜",t:"面霜锁水",ts:"3:40",min:1,said:"取黄豆大小面霜，点涂五点后向外抹开。",inf:"面霜是清爽型还是滋润型未说明，需结合肤质。",how:"点在额头、两颊、鼻尖、下巴，再轻轻推开。",bad:"用量过大搓泥；忽略颈部。",why:"保湿屏障的最后一步，减少水分流失。",skip:"不建议跳过，保湿是基础护肤的核心。",noprod:"用你已有的任何温和保湿霜；没有则优先购买这一类。",dont:"简单说：一颗黄豆的量，点五点，再抹开。"}],
+quiz:[{q:"洁面时间大约多久比较合适？",o:["5 分钟","30–60 秒","10 秒"],a:1},{q:"精华应在什么时候使用？",o:["洁面后、面霜前","面霜之后","洁面前"],a:0}]};
+const AV={leo:{skin:"#E8BC98",hair:"#2A2220",bg:["#C4DBFF","#8FA8FF"],long:0,n:"Leo"},mia:{skin:"#F3CFB3",hair:"#4B2D26",bg:["#FFD6E2","#C8B8FF"],long:1,n:"Mia"}};
+function av(k,sp){const a=AV[k];return`<svg viewBox="0 0 120 120" class="av${sp?" sp":""}" role="img" aria-label="AI 导师 ${a.n}（插画形象）"><defs><linearGradient id="g${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a.bg[0]}"/><stop offset="1" stop-color="${a.bg[1]}"/></linearGradient><clipPath id="c${k}"><circle cx="60" cy="60" r="60"/></clipPath></defs><g clip-path="url(#c${k})"><rect width="120" height="120" fill="url(#g${k})"/>${a.long?`<path d="M30 64C26 30 44 16 62 16s36 14 30 48c-2 22 6 40 6 56H24c0-16 8-34 6-56z" fill="${a.hair}"/>`:""}<path d="M16 120c3-26 21-36 44-36s41 10 44 36z" fill="#fff"/><path d="M47 86l13 19 13-19" fill="none" stroke="#C9D2E3" stroke-width="3"/><rect x="52" y="72" width="16" height="18" rx="7" fill="${a.skin}"/><ellipse cx="60" cy="52" rx="22" ry="26" fill="${a.skin}"/><path d="${a.long?"M37 50c0-20 10-30 24-30s24 10 23 30c-7-3-13-11-15-17-5 8-15 15-32 17z":"M37 52c-3-22 9-33 24-33 16 0 26 10 23 33-3-9-8-14-14-15-9 3-20 3-27 0-3 2-5 8-6 15z"}" fill="${a.hair}"/><ellipse class="eye" cx="51" cy="54" rx="2.6" ry="3.2" fill="#1D1D1F"/><ellipse class="eye" cx="69" cy="54" rx="2.6" ry="3.2" fill="#1D1D1F"/><circle cx="46" cy="62" r="4" fill="#F4A6A0" opacity=".35"/><circle cx="74" cy="62" r="4" fill="#F4A6A0" opacity=".35"/><path class="mouth" d="M53 68q7 6 14 0" fill="none" stroke="#B24B4B" stroke-width="2.4" stroke-linecap="round"/></g></svg>`}
+const S={v:"home",m:"mia",skin:"",sens:"",goal:"",exp:"",bud:30,prods:[],plan:null,i:0,sec:0,say:"",qa:[],ref:"",log:{learned:0,done:0,quiz:0,indep:0,diff:[]},saved:null};
+try{const x=JSON.parse(localStorage.getItem("sp")||"{}");if(x.log)S.log=x.log;if(x.saved)S.saved=x.saved}catch(e){}
+const $=s=>document.querySelector(s),go=v=>{S.v=v;R();scrollTo(0,0)};
+const ch=(k,o)=>`<div class="chips">${o.map(x=>`<button class="chip ${S[k]===x?"on":""}" onclick="S.${k}='${x}';R()">${x}</button>`).join("")}</div>`;
+const owns=c=>S.prods.find(p=>p.cat===c);
+function conflicts(){const t=S.prods.map(p=>p.ing.toLowerCase()),a=/retinol|视黄醇|维a|adapalene|阿达帕林/,b=/aha|bha|glycolic|salicylic|水杨酸|果酸|benzoyl|过氧化苯甲酰/;return t.some(x=>a.test(x))&&t.some(x=>b.test(x))?"你的产品里同时有维A类与酸类/过氧化苯甲酰：刺激风险叠加，建议错开使用并先咨询药师。":""}
+function mkPlan(){return D.steps.map(s=>{const p=owns(s.cat);let mode,note;if(p){mode="use";note=`使用你已有的「${p.name}」。`+(S.sens==="敏感"&&s.cat==="精华"?" 皮肤敏感：先在耳后试用。":"")}else if(s.cat==="精华"){mode="skip";note=`预算 ${S.bud} AUD，暂不需要购买精华，本步可跳过。`}else{mode="buy";note=`尚无${s.cat}。优先补齐这一类（仅推荐类别；无已验证价格数据，不显示价格）。`}return{...s,mode,note}})}
+const V={
+home(){const s=S.saved;return`<div class="hero">${av(S.m)}</div><h1 style="text-align:center">从“看过”<br>到“学会”</h1><p class="mute" style="text-align:center">${AV[S.m].n} 带你把碎片化教程变成能独立完成的护肤流程。</p>
+<div class="card"><b>Watch → Understand → Personalize → Practice → Complete → Review → Reuse</b></div>
+<button class="btn" onclick="go(S.skin?'import':'onboard')">${S.skin?"导入新教程":"开始设置"}</button>${s?`<button class="btn g" onclick="S.plan=mkPlan();S.i=0;S.sec=0;S.say='';go('practice')">重新开始「${s.title}」</button>`:""}<p class="mute" style="text-align:center;margin-top:18px">不提供医疗诊断。不根据自拍判断皮肤问题。</p>`},
+onboard(){return`<h1>了解你的皮肤</h1><p class="mute">用于调整教程，不做医学诊断。</p>
+<h2>选择你的导师</h2><div class="pick">${["leo","mia"].map(k=>`<button class="${S.m===k?"on":""}" onclick="S.m='${k}';R()">${av(k)}<p><b>${AV[k].n}</b></p></button>`).join("")}</div>
+<h2>肤质</h2>${ch("skin",["干性","油性","混合性","中性","不确定"])}<h2>皮肤敏感情况</h2>${ch("sens",["不敏感","偶尔敏感","敏感"])}
+<h2>护肤目标</h2>${ch("goal",["基础保湿","控油","淡化痘印","建立习惯"])}<h2>护肤经验</h2>${ch("exp",["新手","有一点经验","进阶"])}
+<h2>预算（AUD）</h2><input type="number" min="0" value="${S.bud}" oninput="S.bud=+this.value" aria-label="预算">
+<h2>当前拥有的产品</h2>${S.prods.map((p,k)=>`<div class="card" style="padding:14px 18px;margin:8px 0"><b>${p.name}</b> <span class="tag">${p.cat}</span><button class="chip" style="float:right" onclick="S.prods.splice(${k},1);R()">移除</button><p class="mute">${p.ing||"未填成分"}</p></div>`).join("")}
+<input id="pn" placeholder="产品名称"><select id="pc"><option>洁面</option><option>精华</option><option>面霜</option><option>防晒</option></select><input id="pi" placeholder="主要成分（选填，如 retinol、glycolic acid）">
+<button class="btn g" onclick="addP()">添加产品</button>${conflicts()?`<div class="demo">${conflicts()}</div>`:""}
+<button class="btn" onclick="go('import')" ${S.skin&&S.sens?"":"disabled"}>继续</button>`},
+import(){return`<h1>导入教程</h1><p class="mute">上传视频、粘贴链接，或提供截图与文字说明。</p>
+<div class="demo">前端原型：视频、链接、截图解析需要服务端任务，尚未接入（仅在合法且技术允许时获取公开链接内容）。下方演示教程为预置模拟数据，不是真实分析。</div>
+<div class="card"><b>上传视频</b><p class="mute">限制：≤100MB，≤10 分钟，MP4/MOV（服务端异步处理）</p><button class="chip" disabled>即将支持</button></div>
+<div class="card"><b>公开视频链接</b><input placeholder="https://…" disabled><button class="chip" disabled>即将支持</button></div>
+<div class="card"><b>截图或文字说明</b><p class="mute">真实解析由服务端 AI 完成，并区分“明确出现”与“AI 推断”。</p></div>
+<button class="btn" onclick="go('analysis')">使用演示教程</button>`},
+analysis(){return`<h1>${D.title}</h1><div class="demo">演示数据 · 模拟解析结果</div>
+${D.steps.map((s,k)=>`<div class="card"><b>Step ${k+1}：${s.t}</b> <span class="mute">视频 ${s.ts}</span><p><span class="tag">视频明确</span>${s.said}</p><p><span class="tag w">AI 推断</span>${s.inf}</p><p><span class="tag n">证据：演示占位，知识库未接入</span></p></div>`).join("")}
+<div class="card"><b>证据等级（真实知识库将使用）</b><p class="mute">${LV.map(l=>l[0]).join(" / ")}。每条建议附 Reference、Source URL、更新时间；优先 AAD、FDA、NMPA、DermNet 等公开资料。本原型不显示任何真实文献链接。</p></div>
+<button class="btn" onclick="S.plan=mkPlan();go('plan')">为我个性化</button>`},
+plan(){return`<h1>你的方案</h1><p class="mute">${S.skin} · ${S.sens} · ${S.goal||"未选目标"} · ${S.exp||"未选经验"} · ${S.bud} AUD</p>
+${S.plan.map((s,k)=>`<div class="card"><b>${k+1}. ${s.t}</b> <span class="tag ${s.mode==="use"?"":"w"}">${{use:"用已有",skip:"可跳过",buy:"需补齐"}[s.mode]}</span><p>${s.note}</p></div>`).join("")}
+<div class="card"><b>成分冲突提醒</b><p class="mute">${conflicts()||"未发现基础规则内的冲突（基础规则，非完整成分库）。"}</p></div>
+<button class="btn" onclick="S.i=0;S.sec=0;S.say='';go('practice')">开始跟练</button>`},
+practice(){const s=S.plan[S.i];if(!s)return V.quiz();const n=S.plan.length;return`<div class="dots">${S.plan.map((_,k)=>`<i class="${k<=S.i?"on":""}"></i>`).join("")}</div>
+<div style="display:flex;gap:14px;align-items:flex-end">${av(S.m,!!S.say).replace('class="av','style="width:84px;height:84px;flex:none;border-radius:50%" class="av')}<div class="bub" style="margin:0;flex:1">${S.say?`<span class="tag n">演示回答</span><br>${S.say}`:`第 ${S.i+1}/${n} 步：<b>${s.t}</b>`}</div></div>
+<h1 style="margin-top:22px">${s.t}</h1><p>${s.how}</p><p><span class="tag w">常见错误</span>${s.bad}</p><p class="mute">预计 ${s.min} 分钟 · ${s.mode!=="use"?s.note:"使用你已有的产品"}</p>
+<div class="timer" id="tm">${fm(S.sec)}</div>
+<button class="btn" onclick="S.say='';S.i++;S.sec=0;R()">I've done it</button>
+<div class="chips" style="justify-content:center;margin-top:14px">${[["dont","I don't understand"],["why","Why this step?"],["skip","Can I skip this?"],["noprod","What if I don't have this product?"]].map(([k,t])=>`<button class="chip" onclick="ask('${k}')">${t}</button>`).join("")}</div>`},
+quiz(){return`<h1>快速检验</h1><p class="mute">两道小题，确认你理解了关键步骤。</p>${D.quiz.map((x,k)=>`<div class="card"><b>${x.q}</b><div class="chips">${x.o.map((o,j)=>`<button class="chip ${S.qa[k]===j?"on":""}" onclick="S.qa[k]=${j};R()">${o}</button>`).join("")}</div></div>`).join("")}<button class="btn" onclick="S.v='review';R()" ${S.qa.filter(x=>x!==undefined).length<2?"disabled":""}>提交</button>`},
+review(){const ok=D.quiz.filter((x,k)=>S.qa[k]===x.a).length;return`<h1>${ok===2?"理解测试通过":"还有一点没掌握"}</h1><p>答对 ${ok} / 2。点击“完成”不等于掌握，请如实选择：</p><div class="chips">${["照着教程做的","不看教程独立完成"].map(o=>`<button class="chip ${S.ref===o?"on":""}" onclick="S.ref='${o}';R()">${o}</button>`).join("")}</div><input id="df" placeholder="遇到的困难（选填）"><button class="btn" onclick="commit(${ok})" ${S.ref?"":"disabled"}>保存我的流程</button>`},
+routine(){const s=S.saved;return`<h1>我的流程</h1>${s?`<div class="card"><b>${s.title}</b><p class="mute">${s.steps.join(" → ")}</p><button class="btn" onclick="S.plan=mkPlan();S.i=0;S.sec=0;S.say='';go('practice')">一键重新开始</button></div>`:`<div class="card mute">还没有保存的流程。导入教程并完成跟练后会出现在这里。</div>`}`},
+progress(){const l=S.log,r=l.done?Math.round(l.indep/l.done*100):0,p=l.done?Math.round((l.quiz+l.indep)/l.done*100):0,f={};l.diff.forEach(d=>f[d]=(f[d]||0)+1);const t=Object.entries(f).sort((a,b)=>b[1]-a[1]).slice(0,5);return`<h1>学习进度</h1><div class="stat"><div class="card"><b>${l.learned}</b><span class="mute">Tutorials Learned</span></div><div class="card"><b>${l.done}</b><span class="mute">Routines Completed</span></div><div class="card"><b>${r}%</b><span class="mute">Independent Completion Rate</span></div><div class="card"><b>${p}%</b><span class="mute">Learning Progress</span></div></div>
+<div class="card"><b>Common Difficulties</b><p class="mute">${t.length?t.map(x=>`${x[0]}（${x[1]}）`).join("；"):"暂无记录"}</p></div><p class="mute">三档：自报完成 / 理解测试通过 / 独立复现。仅“测试全对 + 独立完成”计入独立完成率。</p>`}};
+const fm=t=>String(t/60|0).padStart(2,"0")+":"+String(t%60).padStart(2,"0");let T;
+function addP(){const n=$("#pn").value.trim();if(!n)return;S.prods.push({name:n,cat:$("#pc").value,ing:$("#pi").value.trim()});R()}
+function ask(k){const s=S.plan[S.i];S.say=k==="noprod"&&s.mode==="use"?"你已有这类产品，直接用即可。":s[k];if(k==="dont")S.log.diff.push("看不懂："+s.t);R()}
+function commit(ok){const d=$("#df").value.trim(),l=S.log;if(d)l.diff.push(d);l.learned++;l.done++;if(ok===2){S.ref.startsWith("不看")?l.indep++:l.quiz++}S.saved={title:D.title,steps:S.plan.filter(s=>s.mode!=="skip").map(s=>s.t)};try{localStorage.setItem("sp",JSON.stringify({log:l,saved:S.saved}))}catch(e){}S.qa=[];S.ref="";go("progress")}
+function R(){$("#app").innerHTML=V[S.v]();const t=[["home","首页"],["import","导入"],["routine","流程"],["progress","进度"]];$("#nav").innerHTML=t.map(([v,x])=>`<button class="${S.v===v?"on":""}" onclick="go('${v}')">${x}</button>`).join("");clearInterval(T);if(S.v==="practice"&&S.plan&&S.plan[S.i])T=setInterval(()=>{S.sec++;const e=$("#tm");if(e)e.textContent=fm(S.sec)},1000)}
+R();
+</script></body></html>
