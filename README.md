@@ -1,8 +1,7 @@
 # SkinPilot AI (MVP 骨架)
 ## 启动
 1. `npm install`
-2. `cp .env.example .env.local` 并填入 OPENAI_API_KEY
-3. `npm run dev` → http://localhost:3000
+3. `npm run dev` 
 4. `npm test`
 ## Supabase
 在 SQL Editor 执行 `supabase/schema.sql`（含 RLS）。
