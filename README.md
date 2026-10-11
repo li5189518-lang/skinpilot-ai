@@ -31,24 +31,6 @@ Most people watch skincare tutorials but never learn to do the routine themselve
 
 **未实现（占位）：** 视频 / 链接 / 截图解析、RAG 知识库与真实来源（Reference、Source URL、证据等级）、产品成分库、摄像头实时指导、完整的 Tailwind / shadcn 界面。
 
-## 本地运行（完整版）/ Run locally
-
-1. `npm install`
-2. `cp .env.example .env.local`，填入 `OPENAI_API_KEY` 与 Supabase 配置
-3. 在 Supabase SQL Editor 执行 `supabase/schema.sql`
-4. `npm run dev` → http://localhost:3000
-5. `npm test`
-
-> 不要提交 `.env.local`。所有 AI 调用都在服务端进行。
-
-## 目录 / Structure
-
-- `docs/index.html` — 在线演示（GitHub Pages）
-- `src/` — Next.js 应用与服务端接口
-- `supabase/schema.sql` — 数据库结构
-- `tests/` — 单元测试
-- `docs/SUBMISSION.md` — 提交材料草稿
-
 ## 下一步 / Roadmap
 
 知识库 RAG（带来源与证据等级）→ 视频异步解析 → Onboarding 与产品落库 → 界面升级。
